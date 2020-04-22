@@ -1,0 +1,209 @@
+lesson-3 词法
+SourceCharacter::
+	any Unicode code point
+	    BMP Unicode范围由U+0800至U+FFFF
+		http://www.fileformat.info/info/unicode/block/basic_latin/list.htm
+		<script>
+			for(let i=0;i<128;i++){
+				document.write(i+'<span style="background-color:lightgreen">'+String.fromCharCode(i)+'</span><br />')
+			}
+		</script>
+
+		CJK + Extension 中日韩字符 U+4E00 U+9FFF
+
+		U+FFFF以内兼容性很好
+		''.charCodeAt
+
+		''.codePointAt可以用来做五位的字符
+		超出ASCII编码的字符，可以用\u转义。
+
+		'厉害'.codePointAt(0).toString(16) // 5389
+
+		'厉害'.codePointAt(1).toString(16) // 5bb3
+		var \u5389\u5bb3 = 1
+		console.log(厉害)
+
+		所有的space都是javascript中合法的space
+InputElement::
+	WhiteSpace // 空白
+	LineTerminator // 换行符
+	Comment // 注释
+	CommonToken
+
+    WhiteSpace::
+        <TAB> // 制表符 \t U+0009
+        <VT> // 纵向制表符 \v U+0011
+        <FF> // FORM-FEED U+0010
+        <SP> // 普通空格 U+0020
+        <NBSP> // NO-BREAK-SPACE &nbsp; U+00A0 加空格不断词 java&nbsp;script
+        <ZWNBSP> // ZERO-WIDTH-NBSP U+FEFF 零宽空格 var\uFEFFa=1 BOM Bit order mask
+        <USP> // unicode的空白
+
+    LineTerminator::
+        <LF> LINE-FEED 换行符 \n U+000A
+        <CR> CARRIAGE-RETURN 回车 \r U+000D
+        <LS> LINE-SEPARATOR U+2028
+        <PS> PARAGRAPH-SEPARATOR U+2029
+
+    Comment::
+        MultiLineComment // 多行注释
+        SingleLineComment // 单行注释
+
+        MultiLineComment::
+            /* MultiLineCommentCharsopt */
+        SingleLineComment::
+            // SingleLineCommentCharsopt
+
+    CommonToken:: 
+        IdentifierName // 标识符,名字
+            Identifier
+            ReservedWords
+                Identifier::
+                    IdentifierName but not ReservedWord
+                ReservedWord::
+                    Keyword // 关键字
+                    FutureReservedWord // 未来关键字
+                    NullLiteral // null
+                    BooleanLiteral // true false
+        Punctuator // 由于除号和正则的问题，除号不在Punctuator里
+        NumericLiteral // 数字直接量
+        StringLiteral // 字符串直接量
+        Template // 模板
+
+        IdentifierName::
+            IdentifierStart
+            IdentifierName IdentifierPart
+
+            IdentifierStart:: // 标识符开头
+                UnicodeIDStart
+                $
+                _
+                \ UnicodeEscapeSequence
+            IdentifierPart :: // 标识符内容
+                UnicodeIDContinue
+                $
+                \ UnicodeEscapeSequence
+                <ZWNJ> // 零宽连接符
+                <ZWJ> // 零宽非连接符
+
+                UnicodeIDStart ::
+                    any Unicode code point with the Unicode property “ID_Start”
+                UnicodeIDContinue ::
+                    any Unicode code point with the Unicode property “ID_Continue”
+
+
+        NumericLiteral:: // Math.abs(0.1+0.2-0.3)<=Number.EPSILON
+            DecimalLiteral
+                0
+                0. // 97 .toString
+                .2
+                1e3
+            BinaryIntegerLiteral
+                0b11
+            OctalIntegerLiteral
+                0o11
+            HexIntegerLiteral
+                0x11
+
+        StringLiteral:: // javascript utf16，不承认bmp之外的字符是一个字符。
+        // 普通情况 utf-8
+        // 中文多的情况 utf-16
+            " DoubleStringCharacters "
+            ' SingleStringCharacters '
+
+            DoubleStringCharacter ::
+                SourceCharacter but not one of " or \ or LineTerminator <LS>
+                <PS>
+                \ EscapeSequence
+                LineContinuation
+
+            SingleStringCharacter ::
+                SourceCharacter but not one of ' or \ or LineTerminator <LS>
+                <PS>
+                \ EscapeSequence
+                LineContinuation
+
+                LineContinuation ::
+                    \ LineTerminatorSequence
+
+                EscapeSequence ::
+                    CharacterEscapeSequence
+                    0 [lookahead ∉ DecimalDigit]
+                    HexEscapeSequence
+                    UnicodeEscapeSequence
+
+                    CharacterEscapeSequence ::
+                        SingleEscapeCharacter
+                        NonEscapeCharacter
+
+                        SingleEscapeCharacter ::
+                            one of '"\bfnrtv
+                        NonEscapeCharacter ::
+                            SourceCharacter but not one of EscapeCharacter or LineTerminator
+
+                            EscapeCharacter ::
+                                SingleEscapeCharacter
+                                DecimalDigit
+                                x
+                                u
+
+                    HexEscapeSequence ::
+                        x HexDigit HexDigit
+                    UnicodeEscapeSequence ::
+                        u Hex4Digits
+                        u{ CodePoint }
+
+                        Hex4Digits ::
+                            HexDigit HexDigit HexDigit HexDigit
+
+        Template ::
+            NoSubstitutionTemplate
+            TemplateHead
+
+            NoSubstitutionTemplate ::
+                ` TemplateCharacters `
+
+            TemplateHead ::
+                ` TemplateCharacters ${
+
+            TemplateSubstitutionTail ::
+                TemplateMiddle
+                TemplateTail
+
+                TemplateMiddle ::
+                    } TemplateCharacters ${
+
+                TemplateTail ::
+                    } TemplateCharacters `
+
+                    TemplateCharacters ::
+                        TemplateCharacter TemplateCharacters
+
+                        TemplateCharacter ::
+                            $ [lookahead ≠ {]
+                            \ EscapeSequence
+                            \ NotEscapeSequence
+                            LineContinuation
+                            LineTerminatorSequence
+                            SourceCharacter but not one of ` or \ or $ or LineTerminator
+
+                            NotEscapeSequence ::
+                            0 DecimalDigit
+                            DecimalDigit but not 0
+                            © Ecma International 2019 709
+                            x [lookahead ∉ HexDigit]
+                            x HexDigit [lookahead ∉ HexDigit]
+                            u [lookahead ∉ HexDigit] [lookahead ≠ {]
+                            u HexDigit [lookahead ∉ HexDigit]
+                            u HexDigit HexDigit [lookahead ∉ HexDigit]
+                            u HexDigit HexDigit HexDigit [lookahead ∉ HexDigit] u { [lookahead ∉ HexDigit]
+                            u { NotCodePoint [lookahead ∉ HexDigit]
+                            u { CodePoint [lookahead ∉ HexDigit] [lookahead ≠ }]
+
+                                NotCodePoint ::
+                                HexDigits but only if MV of HexDigits > 0x10FFFF
+
+                                CodePoint ::
+                                HexDigits but only if MV of HexDigits ≤ 0x10FFFF
+
+
