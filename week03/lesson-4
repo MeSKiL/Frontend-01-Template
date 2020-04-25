@@ -1,0 +1,67 @@
+lession-4 语法
+
+Left-Hand-Side::
+// foo() = 1 语法合法但是不代表会存在，等号左边要返回reference
+	MemberExpression:: 
+		PrimaryExpression // 原子
+
+		MemberExpression [ Expression ] // a['b']
+		MemberExpression . IdentifierName // a.b
+		// 返回的是Reference类型，只有delete和assign会体现引用特性，member运算是Reference
+		// let o = {x:1}
+		// o.x + 2
+		// 1 + 2 结果相同
+
+		// delete o.x
+		// delete 1 结果不同
+		// 加法就可以把Reference解成值
+
+		MemberExpression TemplateLiteral // foo`string`
+		SuperProperty:: // super.xxx || super['xxx;]
+			super [ Expression ]
+			super . IdentifierName
+		MetaProperty:: // new.target
+			NewTarget::
+				new . target // 判断是否是被new调起的
+		new MemberExpression Arguments // new Foo()
+
+	NewExpression::
+		MemberExpression
+		new NewExpression // 意味着new Cls()的优先级大于new Cls
+
+	CallExpression::
+		// (new foo())['b'] 属于MemberExpression
+		// new (foo['b'])
+
+		CoverCallExpressionAndAsyncArrowHead:: // foo()
+			MemberExpression Arguments
+		SuperCall::
+			super Arguments // super()
+		CallExpression Arguments // foo()()
+		CallExpression [ Expression ] // foo()['b']
+		CallExpression . IdentifierName // foo().b
+		CallExpression TemplateLiteral // foo()`string`
+
+	Arguments[Yield, Await] :
+		()
+		( ArgumentList[?Yield, ?Await] )
+		( ArgumentList[?Yield, ?Await] , )
+
+UpdateExpression::
+	LeftHandSideExpression
+	LeftHandSideExpression [no LineTerminator here] ++
+	LeftHandSideExpression [no lineTerminator here] --
+	++ UnaryExpression
+	-- UnaryExpression
+
+UnaryExpression::
+	UpdateExpression // 好像是不合法的？ 不然就可以套娃了 ++ ++ ++ ++ a
+	delete UnaryExpression // delete a.b
+	void UnaryExpression // void foo()
+	typeof UnaryExpression // typeof a
+	+ UnaryExpression // +a
+	- UnaryExpression // -a
+	~ UnaryExpression // ~a
+	! UnaryExpression // !a
+	AwaitExpressioin // await a
+

@@ -54,7 +54,7 @@ InputElement::
         SingleLineComment::
             // SingleLineCommentCharsopt
 
-    CommonToken:: 
+    CommonToken::
         IdentifierName // 标识符,名字
             Identifier
             ReservedWords
