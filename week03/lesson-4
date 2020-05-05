@@ -55,13 +55,88 @@ UpdateExpression::
 	-- UnaryExpression
 
 UnaryExpression::
-	UpdateExpression // 好像是不合法的？ 不然就可以套娃了 ++ ++ ++ ++ a
+	UpdateExpression
 	delete UnaryExpression // delete a.b
-	void UnaryExpression // void foo()
+	void UnaryExpression // void foo() 将返回值变为undefined
 	typeof UnaryExpression // typeof a
+		// typeof null 'object'
+		// typeof function(){} 'function'
 	+ UnaryExpression // +a
 	- UnaryExpression // -a
 	~ UnaryExpression // ~a
-	! UnaryExpression // !a
+	! UnaryExpression // !a 唯一的布尔型转换
 	AwaitExpressioin // await a
 
+ExponentiationExpression::
+	UnaryExpression
+	UpdateExpression ** ExponentialtionExpression
+	//右结合
+
+MultiplicativeExpression::
+	ExponentiationExpression
+	MultiplicativeExpression MultiplicativeOperator ExponentiationExpression
+			MultiplicativeOperator:: one of
+				* / %
+AdditiveExpression::
+	AdditiveExpression + MultiplicativeExpression
+	AdditiveExpression - MultiplicativeExpression
+
+ShiftExpression::
+	ShiftExpression << AdditiveExpression
+	ShiftExpression >> AdditiveExpression
+	ShiftExpression >>> AdditiveExpression
+
+RelationalExpression::
+	ShiftExpression
+	RelationalExpression < ShiftExpression
+	RelationalExpression > ShiftExpression
+	RelationalExpression <= ShiftExpression
+	RelationalExpression >= ShiftExpression
+	RelationalExpression instanceof ShiftExpression
+	RelationalExpression in ShiftExpression
+
+EqualityExpression::
+	EqualityExpression == RelationalExpression
+	EqualityExpression != RelationalExpression
+	EqualityExpression === RelationalExpression
+	EqualityExpression !== RelationalExpression
+
+LogicalANDExpression::
+	BitwiseORExpression
+	LogicalANDExpression && BitwiseORExpression
+
+LogicalORExpression::
+	LogicalANDExpression
+	LogicalORExpression || LogicalANDExpression
+
+ConditionalExpression::
+	LogicalORExpression
+	LogicalORExpression ? AssignmentExpression : AssignmentExpression
+	// 短路逻辑
+
+AssignmentExpression::
+	ConditionalExpression
+	YieldExpression
+	ArrowFunction
+	AsyncArrowFunction
+	LeftHandSideExpression = AssignmentExpression
+	LeftHandSideExpression AssignmentOperator AssignmentExpression
+		AssignmentOperator:: one of
+			* = /= %= += -= <<= >>= >>>= &= ^= |= **=
+
+Expression::
+	AssignmentExpression
+	Expression , AssignmentExpression
+
+
+String Number Boolean Symbol 四种类型转Object会装箱
+Symbol不可以new，可以通过两次装箱实现。
+Object.getPrototypeOf(Object(Symbol('1'))) === Symbol.prototype
+
+1 + {valueOf(){return 2}} // 3
+1 + {toString(){return 3}} // 4
+1 + {valueOf(){return 1},toString(){return '2'}} // 2
+'1' + {valueOf(){return 1},toString(){return '2'}} // '11'
+1 + {[Symbol.toPrimitive](){return 6},valueOf(){return 1},toString(){return '2'}} // 7
+1 + {[Symbol.toPrimitive](){return {}},valueOf(){return 1},toString(){return '2'}} // Error
+//这种情况是因为[Symbol.toPrimitive]默认调用valueOf和toString，如果改写了，就不会调用valueOf和toString了
