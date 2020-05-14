@@ -1,0 +1,40 @@
+lesson-5 语句 对象
+Completion Record // 语句完成后的记录
+    [[type]]:normal,break,continue,return,throw
+    [[value]]:Types // any ECMAScript language value or empty
+    [[target]]:label // any ECMAScript string or empty
+
+Statement::
+    // 简单语句
+    EmptyStatement::
+        ; // ;
+    ExpressionStatement::
+        // 不以 {、function、async function、class、let、[、}、开头的表达式
+        [lookahead ∉ { { , function , async [no LineTerminator here] function , class , let [ }]
+        Expression[+In, ?Yield, ?Await] ; // a = 1 + 2;
+    DebuggerStatement::
+        debugger ; // debugger;
+    ThrowStatement::
+        throw [no LineTerminator here] Expression; // throw a;
+    ContinueStatement::
+        continue ; // continue;
+        continue [no LineTerminator here] LabelIdentifier ; // continue label1;
+    BreakStatement::
+        break ; // break;
+        break [no LineTerminator here] LabelIdentifier ; // break label2;
+    ReturnStatement::
+        return ; // return;
+        return [no LineTerminator here] Expression ; // return a;
+
+    // 复合语句
+    BlockStatement::
+        Block
+        Block::
+            { StatementList }
+            // {a:1} a会被理解成label,而不是对象
+            StatementList::
+                StatementListItem
+                StatementList StatementListItem
+                StatementListItem::
+                    Statement
+                    Declaration
