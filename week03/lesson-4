@@ -2,7 +2,10 @@ lession-4 语法
 
 Left-Hand-Side::
 // foo() = 1 语法合法但是不代表会存在，等号左边要返回reference
-	MemberExpression:: 
+    MemberExpression
+    NewExpression
+    CallExpression
+	MemberExpression::
 		PrimaryExpression // 原子
 
 		MemberExpression [ Expression ] // a['b']
