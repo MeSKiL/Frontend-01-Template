@@ -1,0 +1,6 @@
+lesson-6
+1.事件循环并不是javascript语言的一部分，也不是javascript引擎的一部分。
+2.微任务是javascript引擎的一部分。
+3.有Promise会导致一个宏任务中有多个微任务的情况。所有js代码都是以微任务的形式执行的。所以同步任务也是微任务。
+4.setTimeout是宿主机提供的api，所以是宏任务。Promise是js提供的，所以是微任务。也证明了1 2两点。
+5.Promise在哪个宏任务里resolve的，就排到当前在执行的宏任务的微任务队列的后面。resolve的执行和then的内容一定是在同一个宏任务里的

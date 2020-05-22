@@ -1,4 +1,4 @@
-lesson-5 语句 对象
+lesson-5 语句与声明 对象
 Completion Record // 语句完成后的记录
     [[type]]:normal,break,continue,return,throw
     [[value]]:Types // any ECMAScript language value or empty
@@ -23,7 +23,38 @@ Statement::
     WithStatement
 
     // 简单语句
-    VariableStatement::
+    VariableStatement:: // 其他声明都划分在Declaration里，var划分在语句里
+        var VariableDeclarationList ;
+            VariableDeclarationList::
+                VariableDeclaration
+                VariableDeclarationList , VariableDeclaration
+                VariableDeclaration::
+                    BindingIdentifier Initializer
+                    BindingPattern Initializer
+    // 预处理(BoundNames)会导致变量提升行为,提升变量后赋值为undefined
+        var x = 0;
+        function foo(){
+            var o = {x:1}
+            x = 2
+            with(o){
+                var x = 3 // var 加在 x=3之前，改变了x=2的行为
+            }
+            console.log(x) // 2
+        }
+        foo()
+        console.log(x) // 0
+
+        var x = 0;
+        function foo(){
+            var o = {x:1}
+            x = 2
+            with(o){
+                x = 3
+            }
+            console.log(x) // 2
+        }
+        foo()
+        console.log(x) // 2
     EmptyStatement::
         ; // ;
     ExpressionStatement::
@@ -157,13 +188,168 @@ Statement::
         Finally::
             finally Block
 
+    IfStatement::
+        if ( Expression ) Statement else Statement
+        if ( Expression ) Statement
+
+    WithStatement::
+        with ( Expression ) Statement
+
 Declaration::
     HoistableDeclaration
     ClassDeclaration
     LexicalDeclaration
 
     HoistableDeclaration::
+    // 与var相同，会有预处理阶段，与var不同的是，提升的同时会赋值
         FunctionDeclaration
         GeneratorDeclaration
         AsyncFunctionDeclaration
         AsyncGeneratorDeclaration
+
+        FunctionDeclaration::
+            function BindingIdentifier ( FormalParameters ) { FunctionBody }
+            // function foo() 函数声明
+            (default) function ( FormalParameters ) { FunctionBody }
+            // default export default function(){}
+            FunctionExpression::
+                function BindingIdentifier ( FormalParameters ) { FunctionBody }
+            FunctionBody::
+                FunctionStatementList::
+                    StatementList
+            FormalParameters::
+                [empty]
+                FunctionRestParameter
+                FormalParameterList
+                FormalParameterList ,
+                FormalParameterList , FunctionRestParameter
+
+                FunctionRestParameter::
+                    BindingRestElement
+
+                    BindingRestElement::
+                        ...BindingIdentifier
+                        ...BindingPattern
+                FormalParameterList::
+                    FormalParameter
+                    FormalParameterList , FormalParameter
+                        FormalParameter::
+                            BindingElement
+                            BindingElement::
+                                SingleNameBinding
+                                BindingPattern Initializer
+                                SingleNameBinding::
+                                    BindingIdentifier Initializer
+                                    Initializer::
+                                        = AssignmentExpression
+
+        GeneratorDeclaration::
+            function * BindingIdentifier ( FormalParameters ) { GeneratorBody }
+            (default) function * ( FormalParameters ) { GeneratorBody }
+            GeneratorExpression::
+                function * BindingIdentifier ( FormalParameters ) { GeneratorBody }
+            GeneratorBody::
+                FunctionBody
+
+        AsyncFunctionDeclaration::
+            async function BindingIdentifier ( FormalParameters ) { AsyncFunctionBody }
+            AsyncFunctionExpression::
+                async function ( FormalParameters ) { AsyncFunctionBody }
+                async function BindingIdentifier ( FormalParameters ) { AsyncFunctionBody }
+            AsyncFunctionBody::
+                FunctionBody
+        AsyncGeneratorDeclaration::
+            async function * BindingIdentifier ( FormalParameters ) { AsyncGeneratorBody }
+            (default) function * ( FormalParameters ) { AsyncGeneratorBody }
+            AsyncGeneratorExpression::
+                async function * BindingIdentifier ( FormalParameters ) { AsyncGeneratorBody }
+            AsyncGeneratorBody::
+                FunctionBody
+
+            function sleep(d){
+                return new Promise(resolve => setTimeout(resolve,d))
+            }
+            async function * foo(){
+                let i = 0;
+                while(true){
+                    yield i++;
+                    await sleep(1000)
+                }
+            }
+            void async function(){
+               let g = foo();
+               console.log(await g.next())
+               console.log(await g.next())
+               console.log(await g.next())
+               console.log(await g.next())
+               console.log(await g.next())
+            }()
+
+            void async function(){
+                let g= foo();
+                for await (let e of g){
+                    console.log(e)
+                }
+            }
+
+    ClassDeclaration::
+        class BindingIdentifier ClassTail
+        class ClassTail
+            ClassExpression::
+                class BindingIdentifier ClassTail
+
+            ClassTail::
+                ClassHeritage { ClassBody }
+                ClassHeritage::
+                    extends LeftHandSideExpression
+                ClassBody::
+                    ClassElementList
+                    ClassElementList::
+                        ClassElement
+                        ClassElementList ClassElement
+                        ClassElement::
+                            MethodDefinition
+                            static MethodDefinition
+                            ;
+                            MethodDefinition::
+                                PropertyName ( UniqueFormalParameters ) { FunctionBody }
+                                GeneratorMethod
+                                AsyncMethod
+                                AsyncGeneratorMethod
+                                get PropertyName ( ) { FunctionBody }
+                                set PropertyName ( PropertySetParameterList ) { FunctionBody }
+
+                                PropertyName::
+                                    LiteralPropertyName
+                                    ComputedPropertyName
+                                    LiteralPropertyName::
+                                        IdentifierName
+                                        StringLiteral
+                                        NumericLiteral
+                                    ComputedPropertyName::
+                                        [ AssignmentExpression ]
+                                UniqueFormalParameters::
+                                    FormalParameters
+                                PropertySetParameterList::
+                                    FormalParameter
+            class Test extends String {
+                1(){
+                    console.log(1)
+                }
+                static 2(){
+                    console.log(2)
+                }
+                async test(){}
+            }
+            const test = new Test()
+            test[1]() // 1
+            Test[2]() // 2
+    LexicalDeclaration::
+        LetOrConst BindingList ;
+        BindingList::
+            LexicalBinding
+            BindingList , LexicalBinding
+            LexicalBinding::
+                BindingIdentifier Initializer
+                BindingPattern Initializer
+
