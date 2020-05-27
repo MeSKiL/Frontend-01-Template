@@ -1,0 +1,89 @@
+lesson-7 Realm
+Global Object
+    Infinity
+    NaN
+    undefined
+    eval
+    isFinite
+    isNaN
+    parseFloat
+    parseInt
+    decodeURI
+    encodeURI
+    decodeURIComponent
+    encodeURIComponent
+    Array
+    ArrayBuffer
+    Boolean
+    DataView
+    Date
+    Error
+    EvalError
+    Float32Array
+    Float64Array
+    Function
+    Int8Array
+    Int16Array
+    Int32Array
+    Map
+    Number
+    Object
+    Promise
+    Proxy
+    RangeError
+    ReferenceError
+    RegExp
+    Set
+    SharedArrayBuffer
+    String
+    Symbol
+    SyntaxError
+    TypeError
+    Uint8Array
+    Uint8ClampedArray
+    Uint16Array
+    Uint32Array
+    URIError
+    WeakMap
+    WeakSet
+    Atomics
+    JSON
+    Math
+    Reflect
+
+ECMAScript code Execution Context
+    code evaluation state
+    Function
+    Script or Module
+    Generator(Generator Execution Context)
+    Realm
+        var a = {} // 需要Realm
+        var b = new Array() // 可以直接在LexicalEnvironment取到Array，就不需要Realm
+        Object.getPrototypeOf({}) === Object.prototype // {}的原型等于当前Realm的Object的原型
+        在js中，函数表达式和对象直接量均会创建对象。
+        使用.做隐式转换也会创建对象，转成当前realm中的对象，这些对象是有原型的，如果没有Realm，就不知道它们的原型
+        在iframe创建一个 var o = {};iframe.contentWindow.o instance of Object 是false 别的realm里创建的对象的原型与当前Realm对象的原型并不相同。
+    LexicalEnvironment
+        this // this不仅仅由调用的时候决定，所以要放入LexicalEnvironment
+        new.target
+        super
+        变量
+    VariableEnvironment
+        {
+            let y = 2;
+            eval('var x = 1');
+        }
+
+        with({a:1}){
+            eval('var x;')
+        }
+        console.log(x)
+
+    LexicalEnvironment是一个链表的结构，每一项都是Environment Record。
+    也就是Function Environment Records/Module Environment Records/Global Environment Records/Object Environment Records之一
+    Environment Records // 基类，有很多子类
+        Declarative Environment Records // 声明
+            Function Environment Records
+            Module Environment Records
+        Global Environment Records // 全局
+        Object Environment Records // 由with产生
