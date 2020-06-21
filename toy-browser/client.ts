@@ -1,5 +1,5 @@
 const net = require('net')
-
+const parser = require('./parseHTML')
 // http是文本协议
 type RequestType = 'get' | 'GET' | 'post' | 'POST' | 'put' | 'PUT' | 'delete' | 'DELETE'
 
@@ -58,7 +58,7 @@ ${this.bodyText}
 `
     }
 
-    send(connection?) {
+    send(connection?):Promise<IResponse> {
         return new Promise((resolve, reject) => {
             const parser = new ResponseParser()
             if (connection) {
@@ -72,6 +72,7 @@ ${this.bodyText}
                 })
             }
             connection.on('data', (data) => {
+                console.log(data.toString())
                 parser.receive(data.toString())
                 if (parser.isFinished) {
                     resolve(parser.response)
@@ -101,7 +102,12 @@ enum ParserStatus {
     WAITING_HEADER_BLOCK_END,
     WAITING_BODY
 }
-
+interface IResponse {
+    statusCode:string,
+    statusText:string,
+    headers:any,
+    body:string,
+}
 class ResponseParser {
     current: number
     statusLine: string
@@ -122,7 +128,7 @@ class ResponseParser {
         return this.bodyParser && this.bodyParser.isFinished
     }
 
-    get response() {
+    get response():IResponse {
         this.statusLine.match(/HTTP\/1.1 ([0-9]+) ([^\r\n]+)/)
         return {
             statusCode: RegExp.$1,
@@ -229,8 +235,8 @@ class TrunkedBodyParser {
         } else if (this.current === TrunkedStatus.READING_TRUNK) {
             if (char !== '\r' && char !== '\n') {
                 this.content.push(char)
-                this.length--
             }
+            this.length--
             if (this.length === 0) {
                 this.current = TrunkedStatus.WAITING_NEW_LINE
             }
@@ -250,7 +256,7 @@ void async function () {
     let request = new ToyRequest({
         method: 'POST',
         host: '127.0.0.1',
-        port: 1234,
+        port: 8099,
         path: '/',
         headers: {
             ['X-Foo2']: 'customed'
@@ -260,5 +266,6 @@ void async function () {
         }
     })
     let res = await request.send()
-    console.log(res)
+    console.log(res.body)
+    let dom = parser.parseHTML(res.body)
 }()
