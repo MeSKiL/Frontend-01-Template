@@ -1,5 +1,7 @@
 const net = require('net')
+const images = require('images')
 const parser = require('./parseHTML')
+const render = require('./render')
 // http是文本协议
 type RequestType = 'get' | 'GET' | 'post' | 'POST' | 'put' | 'PUT' | 'delete' | 'DELETE'
 
@@ -266,6 +268,8 @@ void async function () {
         }
     })
     let res = await request.send()
-    console.log(res.body)
     let dom = parser.parseHTML(res.body)
+    let viewport = images(800,600)
+    render(viewport,dom)
+    viewport.save('viewport.jpg')
 }()

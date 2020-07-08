@@ -10,7 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/images": "^2.2.2",
     "@types/node": "^14.0.1",
-    "css": "^2.2.4"
+    "css": "^2.2.4",
+    "images": "^3.2.2"
   }
 }

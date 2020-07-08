@@ -8,7 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 const net = require('net');
+const images = require('images');
 const parser = require('./parseHTML');
+const render = require('./render');
 class ToyRequest {
     constructor(options) {
         this.method = options.method || 'GET';
@@ -234,7 +236,9 @@ void function () {
             }
         });
         let res = yield request.send();
-        console.log(res.body);
         let dom = parser.parseHTML(res.body);
+        let viewport = images(800, 600);
+        render(viewport, dom.children[0].children[3].children[1].children[3]);
+        viewport.save('viewport.jpg');
     });
 }();

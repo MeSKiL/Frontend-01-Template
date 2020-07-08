@@ -1,13 +1,20 @@
 const css = require('css')
+const layout = require("./layout.js")
+const EOF = Symbol('EOF') // EOF:END OF FILE
 let currentToken = null
 let currentAttribute = null
 let currentTextNode = null
 let stack = [{type: 'document', children: [], tagName: ''}]
 let rules = []
 
+// document.styleSheets相当于rules
 function addCSSRules(text) {
     let ast = css.parse(text)
     rules.push(...ast.stylesheet.rules)
+}
+
+function compare(sp1, sp2) {
+    return sp1[0] - sp2[0] || sp1[1] - sp2[1] || sp1[2] - sp2[2] || sp1[3] - sp1[3]
 }
 
 function computeCSS(element) {
@@ -35,7 +42,19 @@ function computeCSS(element) {
             matched = true
         }
         if (matched) {
-            console.log('Element', element, 'matched rule', rule)
+            let sp = specificity(rule.selectors[0])
+            // window.getComputedStyle大致相当于computeCss的结果
+            let computedStyle = element.computedStyle
+            for (let declaration of rule.declarations) {
+                if (!computedStyle[declaration.property]) {
+                    computedStyle[declaration.property] = {}
+                }
+                if (!computedStyle[declaration.property].specificity || compare(computedStyle[declaration.property].specificity, sp) < 0) {
+                    computedStyle[declaration.property].value = declaration.value
+                    computedStyle[declaration.property].specificity = sp
+                }
+            }
+            console.log(element.computedStyle)
         }
     }
 }
@@ -62,6 +81,21 @@ function match(element, selector) {
             return true
         }
     }
+}
+
+function specificity(selector) {
+    let p = [0, 0, 0, 0]
+    let selectorParts = selector.split(' ')
+    for (let part of selectorParts) {
+        if (part.charAt(0) === '#') {
+            p[1] += 1
+        } else if (part.charAt(0) === '.') {
+            p[2] += 1
+        } else {
+            p[3] += 1
+        }
+    }
+    return p
 }
 
 function emit(token) {
@@ -98,6 +132,7 @@ function emit(token) {
             if (top.tagName === 'style') {
                 addCSSRules(top.children[0].content)
             }
+            layout(top)
             stack.pop()
         }
         currentTextNode = null
@@ -113,7 +148,6 @@ function emit(token) {
     }
 }
 
-const EOF = Symbol('EOF') // EOF:END OF FILE
 
 function data(c) {
     if (c === '<') {
