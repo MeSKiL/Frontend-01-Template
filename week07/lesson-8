@@ -1,0 +1,107 @@
+lesson-8
+CSS总体结构
+2.1时代唯一四条@规则
+    @charset
+    @import
+    rules
+        @media
+        @page
+        rule
+
+
+stylesheet
+    [ CHARSET_SYM STRING ';' ]?
+        CHARSET_SYM:'@charset'
+        STRING:{string}
+    [S|CDO|CDC]* [ import [ CDO S* | CDC S* ]* ]*
+        // CDO/CDC是为了兼容曾经不支持<style></style>标签的浏览器，不把css规则渲染为文字，而是当做html注释
+        // <style><!-- div{width:100px} --></style>
+        CDO:'<!--'
+        CDC:'-->'
+        import:
+            IMPORT_SYM S*
+                IMPORT_SYM: @{I}{M}{P}{O}{R}{T}
+            [ STRING|URI ]  S* media_list? ';' S*
+                URI: 'url('{w}{string}{w}')'|| 'url('{w}{url}{w}')'
+                media_list:
+                    medium [ COMMA S* medium ]*
+                        medium:
+                            IDENT S*
+                                IDENT:{ident}
+    [ [ ruleset | media | page ] [CDO S* | CDC S* ]* ]*
+        ruleset:
+            // 以逗号分割的若干个selector，selector前面可以有空白符
+            selector [ ',' S* selector ]*
+            // 以分号分割的若干个declaration
+            '{' S* declaration? [ ';' S* declaration? ]* '}' S*
+                selector:
+                    simple_selector [ combinator selector | S+ [ combinator? selector ]? ]?
+                        simple_selector:
+                            element_name [ HASH | class | attrib | pseudo ]* |
+                                element_name: IDENT | '*'
+                                HASH: '#'{name}
+                                class: '.' IDENT
+                                attrib: '[' S* IDENT S* [ [ '=' | INCLUDES | DASHMATCH ] S* [IDENT | STRING] S* ]? ']'
+                                pseudo: ':' [ IDENT | FUNCTION S* [IDENT S*]? ')' ]
+                            [ HASH | class | attrib | pseudo ]+
+                        combinator: '+' S* | '>' S*
+                declaration:
+                    property ':' S* expr prio?
+                        property: IDENT S*
+                        expr: term [ operator? term ]*
+                            term: unary_operator? [ NUMBER S* | PERCENTAGE S* | LENGTH S* | EMS S* | EXS S* | ANGLE S* | TIME S* | FREQ S* ] | STRING S* | IDENT S* | URI S* | hexcolor | function
+                                unary_operator: '-' | '+'
+                            operator: '/' S* | ',' S*
+                        prio: IMPORTANT_SYM S*
+                            IMPORTANT_SYM: '!'({w}|{comment})*{I}{M}{P}{O}{R}{T}{A}{N}{T}
+
+CSS
+    At-rules
+        @charset
+        @import
+        @media
+        @page
+        @namespace
+        @supports
+        @document
+        @font-face
+        @keyframes
+        @viewport
+        @counter-style
+        @font-feature-values
+    rule
+        Selector
+        // html body~div>div#id.cls.cls2:visited::first-letter:not(.cls), div#id2
+            selector_group
+            combinator
+            simple_selector
+                type
+                *
+                #
+                .
+                []
+                :
+                ::
+        Declaration
+            Key
+                property
+                variable
+                    :root{
+                        --main-color: #06c;
+                        --accent-color: #006;
+                    }
+                    #foo h1{
+                        color: var(--main-color)
+                    }
+
+                    :root { --color: blue; }
+                    div { --color: green }
+                    #alert { --color:red }
+                    * { color: var(--color) }
+
+                    .foo{
+                        --side: margin-top;
+                        var(--side): 20px;
+                    }
+            Value
+

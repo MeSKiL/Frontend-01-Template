@@ -1,0 +1,62 @@
+lesson-9
+选择器语法
+    简单选择器
+        * 不改变优先级
+        div svg|a 3
+        .cls 2
+        #id 1
+        [attr=value] [attr] [attr~=value] 2
+        :hover 2
+        ::before 2
+        :not() 取决于括号内优先级
+
+    复合选择器
+        <简单选择器><简单选择器><简单选择器>
+        * 或者 div必须写在最前面
+    复杂选择器
+        <复合选择器><sp><复合选择器>
+        <复合选择器>'>'<复合选择器>
+        <复合选择器>'~'<复合选择器>
+        <复合选择器>'+'<复合选择器>
+        <复合选择器>'||'<复合选择器>
+    选择器列表
+        <选择器>,<选择器>
+
+伪类/行为
+    :any-link // 所有超链接
+    :link :visited // 未访问过的超链接 访问过的超链接
+    :hover
+    :active
+    :focus
+    :target
+    :empty
+    :nth_child()
+    :nth-last-child()
+    :first-child :last-child :only-child
+    :not
+    :where :has
+伪元素
+    ::before
+    ::after
+    ::firstLine // 浏览器里显示的第一行
+    // 并不是计算好了哪些文字在第一行，而是先加上了属性以后，再渲染第一行。但是盒模型相关的属性就不行
+        font
+        color
+        background
+        word-spacing
+        letter-spacing
+        text-decoration
+        text-transform
+        line-height
+    ::firstLetter
+        font
+        color
+        background
+        text-decoration
+        text-transform
+        letter-spacing
+        word-spacing
+        line-height
+        float
+        vertical-align
+        margin,padding,border
