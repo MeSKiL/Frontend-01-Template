@@ -3,7 +3,8 @@ const server = http.createServer((req, res) => {
     res.setHeader('Content-Type', 'text/html')
     res.setHeader('X-Foo', 'bar')
     // res.writeHead(200, {'Content-Type': 'text/plain'})
-    res.end(`<html maaa=a >
+    res.end(`
+        <html maaa=a >
             <head>
                 <style>
             #container {
@@ -29,8 +30,7 @@ const server = http.createServer((req, res) => {
                     <div class="c1"></div>
                 </div>
             </body>
-        </html>
-        `)
+        </html>`)
 })
 server.listen(8099, () => {
     console.log('localhost:8099 is work...')
