@@ -1,0 +1,54 @@
+lesson-13 dom
+DOM
+NODE
+    Element 元素型节点
+        HTMLElement
+        SVGElement
+    Document 文档根节点
+    CharacterData 字符数据
+        Text 文本节点
+            CDATASection
+        Comment
+        ProcessingInstruction
+    DocumentFragment 文档片段
+    DocumentType 文档类型
+
+导航类操作
+    parentNode
+    childNodes 会实时变化
+    firstChild
+    lastChild
+    nextSibling
+    previousSibling
+
+修改操作
+    所有的dom元素只有一个父元素。挂在a上以后，再挂到b上，会先从a上摘下来。二次插入一个元素会自动从第一次摘下
+    appendChild
+    insertBefore 无法插入最后一个 与appendChild形成完备性
+    removeChild
+    replaceChild
+高级操作
+    compareDocumentPosition 是一个用于比较两个节点中关系的函数
+    contains 检查一个节点是否包含另一个节点
+    isEqualNode 检查两个节点是否完全相同
+    isSameNode 检查两个节点是否是同一个节点 ===
+    cloneNode 复制一个节点，如果传入参数true，则会连同子元素做深拷贝
+
+Browser Api
+    DOM
+        DOM Tree
+        Events
+            addEventListener(type,listener[,options])
+            addEventListener(type,listener[,useCapture])
+            addEventListener(type,listener[,useCapture,wantsUntrusted])
+            listener 可以传{handleEvent:function(){}}
+            options
+                capture
+                once
+                passive 不会preventDefault，要禁止滚动就需要显示的传true
+        Range
+    CSSOM
+    BOM
+    Web Animation
+    Crypto
+    ...

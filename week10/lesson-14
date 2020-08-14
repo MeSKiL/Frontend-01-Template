@@ -1,0 +1,17 @@
+lesson-14 other api
+    Range API
+    var range = new Range()
+    range.setStart(element,9)
+    range.setEnd(element,4)
+    var range = document.getSelection().getRangeAt(0)
+
+    range.setStartBefore
+    range.setEndBefore
+    range.setStartAfter
+    range.setEndAfter
+    range.selectNode
+    range.selectNodeContents
+
+    // 把内容摘出来
+    var fragment = range.extractContents()
+    range.insertNode(document.createTextNode('aaa'))

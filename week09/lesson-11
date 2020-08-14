@@ -1,0 +1,26 @@
+lesson-11 css动画
+Animation
+    @keyframes 定义 关键帧
+        @keyframes mykf{
+            0% / from { top:0;transition:top ease }
+            50% { top:30px;transition:top ease-in }
+            75% { top:10px;transition:top ease-out }
+            100% / to { top:0;transition:top linear }
+        }
+    animation 使用
+        animation-name 时间曲线 对应keyframes
+        animation-duration 动画时长
+        animation-timing-function 动画的时间曲线
+        animation-delay 动画开始前的延迟
+        animation-iteration-count 动画的播放次数
+        animation-direction 动画的方向
+
+Transition
+    transition 使用
+        transition-property 要变化的属性
+        transition-duration 变换的时长
+        transition-timing-function 时间曲线
+        transition-delay 延迟
+
+颜色
+CMYK RGB

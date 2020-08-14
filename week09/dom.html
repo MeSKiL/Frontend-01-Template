@@ -1,0 +1,13 @@
+<div id="x">
+    <div>1</div>
+    <div>2</div>
+</div>
+<div id="b"></div>
+<script>
+    // x里的b会消失
+    let children = document.getElementById('x').children
+    console.log(children)
+    document.getElementById('b').appendChild(document.getElementById('x').children[1])
+    // children会改变，所以不用能for循环去做插入删除操作
+    console.log(children)
+</script>
