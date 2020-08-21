@@ -1,8 +1,7 @@
-<div id="am">123456789</div>
+<div id="a">123<span>456789</span>0123456787</div>
 <script>
-    let element = document.getElementById('a').childNodes[0]
     let range = new Range()
-    range.setStart(element,3)
-    range.setEnd(element,6)
+    range.setStart(document.getElementById('a').childNodes[0],3)
+    range.setEnd(document.getElementById('a').childNodes[2],3)
     range.extractContents()
 </script>
