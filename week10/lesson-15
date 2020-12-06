@@ -1,1 +1,48 @@
 lesson-15 CSSOM
+CSSStyleSheet 继承 StyleSheet
+    CSSOM api 批量操作style
+    Rules 需要有style标签
+    document.styleSheets[0].cssRules
+    document.styleSheets[0].insertRule("p{color:pink;}",0)
+    document,styleSheets[0].removeRule(0)
+
+    CSSStyleRule
+        selectorText String
+        style k-v结构
+    CSSCharsetRule
+    CSSImportRule
+    ...
+
+window.getComputedStyle(elt,pseudoElt)
+
+let childWindow = window.open("about:blank","_blank","width=100,height=100,left:100,top=100")
+childWindow.moveBy(-50,-50)
+childWindow.resizeBy(50,50)
+// 滚到哪
+window.scroll(0,0)
+window.scrollBy(0,50)
+window.scrollY
+window.scrollX
+
+$0.scrollBy()
+$0.scrollTo()
+$0.scrollTop
+$0.scrollLeft
+$0.scrollHeight
+
+$0.getClientRects() 数组是因为inline的组件会产生多个盒
+$0.getBoundingClientRect()
+
+// 视口
+window.innerHeight
+document.documentElement.getBoundingClientRect()
+window.innerWidth
+// 物理设备
+window.screenHeight
+window.screenWidth
+// 浏览器占用的空间，没啥用，包括debugger
+window.outerHeight
+window.outerWidth
+
+// 物理像素与实际像素的比值
+window.devicePixelRatio

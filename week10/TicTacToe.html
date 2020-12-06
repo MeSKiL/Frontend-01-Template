@@ -1,0 +1,144 @@
+<style>
+    .cell {
+        width: 100px;
+        height: 100px;
+        background-color: green;
+        display: inline-block;
+        border: solid 1px white;
+        vertical-align: middle;
+        line-height: 100px;
+        font-size: 50px;
+        text-align: center;
+    }
+</style>
+<div id="board"></div>
+<script>
+    let user = 1
+    let finish = false
+    let pattern = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+    ]
+
+    function show() {
+        let board = document.getElementById('board')
+        board.innerHTML = ''
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                let cell = document.createElement('div')
+                cell.classList.add('cell')
+                cell.innerText = pattern[i][j] === 2 ? '❌' :
+                    pattern[i][j] === 1 ? '⭕️' : ''
+                cell.addEventListener('click', () => userMove(j, i))
+                board.appendChild(cell)
+            }
+            board.appendChild(document.createElement('br'))
+        }
+    }
+
+    function userMove(x, y) {
+        if (pattern[y][x] !== 0 || finish) {
+            return
+        }
+        pattern[y][x] = user
+        if (check(pattern, user)) {
+            console.log(user === 2 ? '❌ is winner!' : '⭕️ is winner!')
+            show()
+            finish = true
+            return
+        }
+        user = 3 - user
+        if (willWin(pattern, user)) {
+            console.log(user === 2 ? '❌ will win!' : '⭕️ will win!')
+        }
+        show()
+        computerMove()
+    }
+
+    function computerMove() {
+        let choice = bestChoice(pattern, user)
+        if (choice.point) {
+            pattern[choice.point[1]][choice.point[0]] = user
+        }
+        if (check(pattern, user)) {
+            console.log(user === 2 ? '❌ is winner!' : '⭕️ is winner!')
+            show()
+            finish = true
+            return
+        }
+        user = 3 - user
+        show()
+    }
+
+    function check(pattern, user) {
+        return pattern.some((line) => {
+                return line.reduce((res, item) => res * item, 1) === Math.pow(user, 3)
+            }) ||
+            pattern[0][0] * pattern[1][1] * pattern[2][2] === Math.pow(user, 3) ||
+            pattern[0][2] * pattern[1][1] * pattern[2][0] === Math.pow(user, 3) ||
+            pattern.some((line, index) => {
+                return pattern[0][index] * pattern[1][index] * pattern[2][index] === Math.pow(user, 3)
+            })
+    }
+
+    function clone(pattern) {
+        return JSON.parse(JSON.stringify(pattern))
+    }
+
+    function willWin(pattern, user) {
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (pattern[i][j] !== 0) {
+                    continue
+                }
+                let tmp = clone(pattern)
+                tmp[i][j] = user
+                if (check(tmp, user)) {
+                    return [j, i]
+                }
+            }
+        }
+        return null
+    }
+
+    let openings = new Map()
+    openings.set([[0, 0, 0], [0, 0, 0], [0, 0, 0]].toString(), {
+        point: [1, 1],
+        result: 0
+    })
+
+    function bestChoice(pattern, user) {
+        if (openings.has(pattern.toString())) {
+            return openings.get(pattern.toString())
+        }
+        let point = willWin(pattern, user)
+        if (point) {
+            return {
+                point: point,
+                result: 1
+            }
+        }
+        let result = -1
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                if (pattern[i][j] !== 0)
+                    continue
+                let tmp = clone(pattern)
+                tmp[i][j] = user
+                let opp = bestChoice(tmp, 3 - user)
+                if ((opp.result * -1) >= result) {
+                    point = [j, i]
+                    result = -opp.result
+                }
+            }
+        }
+        return {
+            point: point,
+            result: point ? result : 0
+        }
+    }
+
+    show()
+
+</script>

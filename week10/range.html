@@ -1,7 +1,11 @@
-<div id="a">123<span>456789</span>0123456787</div>
+<p>456789</p>
 <script>
     let range = new Range()
-    range.setStart(document.getElementById('a').childNodes[0],3)
-    range.setEnd(document.getElementById('a').childNodes[2],3)
-    range.extractContents()
+    let span =document.querySelector('p')
+    range.setStart(span.childNodes[0],3)
+    range.setEndAfter(span)
+    let a = range.extractContents()
+    range.setStartAfter(span)
+    range.setEndAfter(span)
+    range.insertNode(a)
 </script>
